@@ -260,7 +260,7 @@ jobs:
               - type: append
                 matrix:
                   arch: [manylinux2014-aarch64]
-                  py2: ["36","37","38","39","310","311"]
+                  py2: ["36","37","38","39","310","311","312"]
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
   
@@ -556,8 +556,13 @@ jobs:
       - run: unzip core-dockcross-${{ matrix.arch }}.zip
       - name: Setup dockcross
         run: |
-          docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
-          docker run --rm --env DEFAULT_DOCKCROSS_IMAGE=ghcr.io/jgillis/${{ matrix.arch }}:production ghcr.io/jgillis/${{ matrix.arch }}:production > dockcross
+          if [[ "${{ matrix.arch }}" == "manylinux2014-aarch64" ]]; then
+            docker pull dockcross/manylinux2014-aarch64:latest
+            docker run --rm --env DEFAULT_DOCKCROSS_IMAGE=dockcross/manylinux2014-aarch64:latest dockcross/manylinux2014-aarch64:latest > dockcross
+          else
+            docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
+            docker run --rm --env DEFAULT_DOCKCROSS_IMAGE=ghcr.io/jgillis/${{ matrix.arch }}:production ghcr.io/jgillis/${{ matrix.arch }}:production > dockcross
+          fi
           chmod +x dockcross
       - uses: casadi/mockups@master
         with:
@@ -637,8 +642,13 @@ jobs:
       - run: unzip core-dockcross-${{ matrix.arch }}.zip
       - name: Setup dockcross
         run: |
-          docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
-          docker run --rm --env DEFAULT_DOCKCROSS_IMAGE=ghcr.io/jgillis/${{ matrix.arch }}:production ghcr.io/jgillis/${{ matrix.arch }}:production > dockcross
+          if [[ "${{ matrix.arch }}" == "manylinux2014-aarch64" ]]; then
+            docker pull dockcross/manylinux2014-aarch64:latest
+            docker run --rm --env DEFAULT_DOCKCROSS_IMAGE=dockcross/manylinux2014-aarch64:latest dockcross/manylinux2014-aarch64:latest > dockcross
+          else
+            docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
+            docker run --rm --env DEFAULT_DOCKCROSS_IMAGE=ghcr.io/jgillis/${{ matrix.arch }}:production ghcr.io/jgillis/${{ matrix.arch }}:production > dockcross
+          fi
           chmod +x dockcross
       - run: echo ${{env.GITHUB_WORKSPACE}}
       - run: cat $GITHUB_ENV
